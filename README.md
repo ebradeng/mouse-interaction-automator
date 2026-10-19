@@ -4,7 +4,9 @@ A Python desktop application for configurable mouse clicks and scrolling within 
 
 ## Application Preview
 
-![Mouse Interaction Automator interface](assets/application-screenshot.png)
+<img src="assets/application-screenshot.png"
+     alt="Mouse Interaction Automator interface"
+     width="450">
 
 ## Features
 
