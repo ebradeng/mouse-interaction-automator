@@ -95,7 +95,7 @@ try {
     $wsh = New-Object -ComObject WScript.Shell
     $desktop = [Environment]::GetFolderPath('DesktopDirectory')
     $programs = [Environment]::GetFolderPath('Programs')
-    foreach ($lnk in @((Join-Path $desktop 'Mouse Interaction Automator.lnk'), (Join-Path $programs 'Mouse Interaction Automator.lnk'))) {
+    foreach ($lnk in @((Join-Path $desktop 'MIA.lnk'), (Join-Path $programs 'Mouse Interaction Automator.lnk'))) {
         $shortcut = $wsh.CreateShortcut($lnk)
         $shortcut.TargetPath = $venvPythonw
         $shortcut.Arguments = ('"{0}"' -f $installedScript)

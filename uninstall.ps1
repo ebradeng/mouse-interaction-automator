@@ -4,7 +4,7 @@ try {
     $programs = [Environment]::GetFolderPath('Programs')
     $appDir = Join-Path $env:LOCALAPPDATA 'RandomScrollClick'
     Write-Host 'Close Mouse Interaction Automator before uninstalling.'
-    foreach ($shortcutPath in @((Join-Path $desktop 'Mouse Interaction Automator.lnk'), (Join-Path $programs 'Mouse Interaction Automator.lnk'))) {
+    foreach ($shortcutPath in @((Join-Path $desktop 'MIA.lnk'), (Join-Path $desktop 'Mouse Interaction Automator.lnk'), (Join-Path $programs 'Mouse Interaction Automator.lnk'))) {
         if (Test-Path -LiteralPath $shortcutPath) { Remove-Item -LiteralPath $shortcutPath -Force }
     }
     if (Test-Path -LiteralPath $appDir) { Remove-Item -LiteralPath $appDir -Recurse -Force }

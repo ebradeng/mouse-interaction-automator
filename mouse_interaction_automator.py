@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Cross-platform random scroll-then-click desktop automation.
 
-Dependencies: pip install pyautogui pynput
+Dependencies: pip install -r requirements.txt
 Run: python mouse_interaction_automator.py
 
 Global shortcuts:
@@ -38,10 +38,12 @@ from tkinter import messagebox, ttk
 try:
     import pyautogui
     from pynput import keyboard
+    import pystray
+    from PIL import Image, ImageDraw
 except ImportError as exc:
     raise SystemExit(
         "Missing dependency. Install with:\n"
-        "    python -m pip install pyautogui pynput\n"
+        "    python -m pip install -r requirements.txt\n"
         f"Details: {exc}"
     ) from exc
 
@@ -139,6 +141,7 @@ class MouseAutomationApp:
         self.stop_event = threading.Event()
         self.run_event = threading.Event()
         self.messages = queue.Queue()
+        self.tray_icon = None
 
         self.scroll_min_var = tk.StringVar(value="200")
         self.scroll_max_var = tk.StringVar(value="400")
@@ -208,6 +211,7 @@ class MouseAutomationApp:
         self.toggle_button.pack(side="left", expand=True, fill="x", padx=(0, 5))
         self.stop_button = ttk.Button(buttons, text="Stop", command=self.stop)
         self.stop_button.pack(side="left", expand=True, fill="x", padx=(5, 0))
+        ttk.Button(main, text="Run in Background (System Tray)", command=self.minimize_to_tray).pack(fill="x", pady=(4, 6))
 
         ttk.Label(main, textvariable=self.status_var, wraplength=440, foreground="#226e85").pack(anchor="w")
         ttk.Label(
@@ -381,11 +385,54 @@ class MouseAutomationApp:
         finally:
             self.messages.put(("finished", None))
 
+    def _tray_image(self):
+        """Draw a distinct MIA monogram for the system tray only."""
+        image = Image.new("RGBA", (64, 64), (28, 50, 72, 255))
+        draw = ImageDraw.Draw(image)
+        draw.rounded_rectangle((2, 2, 61, 61), radius=15,
+                               outline=(108, 191, 210, 255), width=3)
+        draw.polygon([(16, 44), (16, 21), (24, 35), (32, 21), (32, 44)],
+                     fill=(255, 255, 255, 255))
+        draw.rectangle((38, 21, 43, 44), fill=(255, 255, 255, 255))
+        draw.polygon([(47, 44), (51, 21), (55, 44)],
+                     fill=(255, 255, 255, 255))
+        return image
+
+    def minimize_to_tray(self):
+        """Hide the settings window while keeping a visible tray icon."""
+        if self.selecting:
+            return
+        if self.tray_icon is None:
+            menu = pystray.Menu(
+                pystray.MenuItem("Open Mouse Interaction Automator", lambda icon, item: self.messages.put(("show_window", None)), default=True),
+                pystray.MenuItem("Stop automation", lambda icon, item: self.request_stop()),
+                pystray.Menu.SEPARATOR,
+                pystray.MenuItem("Quit Mouse Interaction Automator", lambda icon, item: self.messages.put(("quit_app", None))),
+            )
+            self.tray_icon = pystray.Icon("mouse_interaction_automator", self._tray_image(), "MIA", menu)
+            try:
+                self.tray_icon.run_detached()
+            except Exception as exc:
+                self.tray_icon = None
+                messagebox.showerror("System tray unavailable", str(exc), parent=self.root)
+                return
+        self.root.withdraw()
+
+    def show_from_tray(self):
+        self.root.deiconify()
+        self.root.lift()
+        self.root.focus_force()
+
     def process_messages(self):
         try:
             while True:
                 kind, data = self.messages.get_nowait()
-                if kind == "toggle":
+                if kind == "show_window":
+                    self.show_from_tray()
+                elif kind == "quit_app":
+                    self.close()
+                    return
+                elif kind == "toggle":
                     self.toggle()
                 elif kind == "stop":
                     self.stop()
@@ -408,6 +455,9 @@ class MouseAutomationApp:
         self.run_event.set()
         if self.hotkeys is not None:
             self.hotkeys.stop()
+        if self.tray_icon is not None:
+            self.tray_icon.stop()
+            self.tray_icon = None
         self.root.destroy()
 
 

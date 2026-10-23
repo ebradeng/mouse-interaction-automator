@@ -2,12 +2,6 @@
 
 A Python desktop application for configurable mouse clicks and scrolling within a user-selected area of the screen. The application includes a graphical interface, adjustable random intervals, global keyboard shortcuts, and a Windows installation utility.
 
-## Application Preview
-
-<img src="assets/application-screenshot.png"
-     alt="Mouse Interaction Automator interface"
-     width="450">
-
 ## Features
 
 - **Screen region selection:** Draw a rectangle to define where mouse interactions can occur.
@@ -17,6 +11,8 @@ A Python desktop application for configurable mouse clicks and scrolling within 
 - **Graphical interface:** Change settings without modifying the Python source code.
 - **Keyboard shortcuts:** Start, pause, resume, or stop the automation.
 - **Windows installer:** Install dependencies, add desktop and Start Menu shortcuts, and launch the application.
+- **System tray mode:** Minimize the settings window to the Windows notification area while keeping the application accessible through a tray menu.
+- **Tray appearance:** Show an MIA monogram icon with the tooltip `MIA` independently from the desktop shortcut icon.
 
 ## Technologies
 
@@ -24,6 +20,8 @@ A Python desktop application for configurable mouse clicks and scrolling within 
 - Tkinter for the graphical interface
 - PyAutoGUI for mouse control and scrolling
 - pynput for global keyboard shortcuts
+- pystray for the Windows system tray menu
+- Pillow for drawing the tray icon
 - PowerShell and Windows batch scripts for installation
 
 ## Installation
@@ -34,7 +32,7 @@ A Python desktop application for configurable mouse clicks and scrolling within 
 2. Extract the ZIP file. Do not run the installer directly from inside the ZIP viewer.
 3. Double-click `Install.cmd`.
 4. Follow any prompts to install Python or required dependencies.
-5. Launch **Mouse Interaction Automator** using the desktop or Start Menu shortcut.
+5. Launch the application using the **MIA** desktop shortcut or **Mouse Interaction Automator** in the Start Menu.
 
 The installer checks for Python 3.10 or newer with Tkinter. If needed, it uses Windows Package Manager (`winget`) to install Python 3.13 for the current user. It then creates an application-specific virtual environment and installs the Python dependencies.
 
@@ -76,6 +74,11 @@ On macOS, you may need to enable Accessibility permissions for the application r
 | Stop | `Ctrl + Shift + Q` |
 | Emergency fail-safe | Move the mouse pointer to a screen corner |
 
+
+### Run in Background (Windows)
+
+Click **Run in Background (System Tray)** to hide the settings window and remove its taskbar entry. The application continues running with an MIA monogram icon and the tooltip `MIA` in the Windows notification area. Right-click the tray icon to **Open Mouse Interaction Automator**, **Stop automation**, or **Quit Mouse Interaction Automator**. The global shortcuts remain available while backgrounded. The desktop shortcut is named `MIA`, while the Start Menu shortcut retains the full application name. This feature does not hide the running Python process from Windows or monitoring tools.
+
 ## Updating or Uninstalling (Windows)
 
 To update an existing installation, run `Install.cmd` again from a newer extracted package. The installer checks dependencies and replaces the application script.
@@ -97,6 +100,6 @@ To uninstall, close the application and run `Uninstall.cmd` from the extracted i
 | `requirements.txt` | Python dependencies |
 | `Install.cmd` and `install.ps1` | Windows installer |
 | `Uninstall.cmd` and `uninstall.ps1` | Windows uninstaller |
-| `app.ico` | Application shortcut and window icon |
+| `app.ico` | Desktop shortcut and application window icon; the system tray icon is generated separately |
 | `.gitignore` | Files excluded from version control |
 
